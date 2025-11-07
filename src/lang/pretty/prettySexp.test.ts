@@ -1,9 +1,9 @@
 import { test } from "node:test"
-import * as X from "../index.ts"
+import * as S from "../index.ts"
 import { prettySexp } from "./index.ts"
 
 function testWidths(widths: Array<number>, code: string) {
-  const sexps = X.parseSexps(code)
+  const sexps = S.parseSexps(code)
   for (const sexp of sexps) {
     for (const width of widths) {
       console.log(`${"-".repeat(width)}|${width}`)

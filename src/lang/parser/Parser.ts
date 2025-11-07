@@ -1,6 +1,6 @@
 import { ErrorWithMeta } from "../errors/index.ts"
 import { Lexer, lexerMatchBrackets } from "../lexer/index.ts"
-import * as X from "../sexp/index.ts"
+import * as S from "../sexp/index.ts"
 import { type Sexp } from "../sexp/index.ts"
 import { spanUnion } from "../span/index.ts"
 import { tokenMetaToSexpMeta, type Token } from "../token/index.ts"
@@ -39,7 +39,7 @@ export class Parser {
     switch (token.kind) {
       case "Symbol": {
         return {
-          sexp: X.Symbol(token.value, tokenMetaToSexpMeta(token.meta)),
+          sexp: S.Symbol(token.value, tokenMetaToSexpMeta(token.meta)),
           remain: tokens.slice(1),
         }
       }
@@ -53,12 +53,12 @@ export class Parser {
 
         if (token.value.includes(".") || token.value.includes("e")) {
           return {
-            sexp: X.Float(value, tokenMetaToSexpMeta(token.meta)),
+            sexp: S.Float(value, tokenMetaToSexpMeta(token.meta)),
             remain: tokens.slice(1),
           }
         } else {
           return {
-            sexp: X.Int(value, tokenMetaToSexpMeta(token.meta)),
+            sexp: S.Int(value, tokenMetaToSexpMeta(token.meta)),
             remain: tokens.slice(1),
           }
         }
@@ -66,7 +66,7 @@ export class Parser {
 
       case "DoubleQoutedString": {
         return {
-          sexp: X.String(token.value, tokenMetaToSexpMeta(token.meta)),
+          sexp: S.String(token.value, tokenMetaToSexpMeta(token.meta)),
           remain: tokens.slice(1),
         }
       }
@@ -77,7 +77,7 @@ export class Parser {
             token,
             tokens.slice(1),
           )
-          return { sexp: X.Cons(X.Symbol("@tael"), sexp), remain }
+          return { sexp: S.Cons(S.Symbol("@tael"), sexp), remain }
         }
 
         if (token.value === "{") {
@@ -85,7 +85,7 @@ export class Parser {
             token,
             tokens.slice(1),
           )
-          return { sexp: X.Cons(X.Symbol("@set"), sexp), remain }
+          return { sexp: S.Cons(S.Symbol("@set"), sexp), remain }
         }
 
         return this.handleTokensInBracket(token, tokens.slice(1))
@@ -105,20 +105,20 @@ export class Parser {
           "`": "@quasiquote",
         }
 
-        const quoteSymbol = X.Symbol(
+        const quoteSymbol = S.Symbol(
           quoteTable[token.value],
           tokenMetaToSexpMeta(token.meta),
         )
 
         return {
-          sexp: X.List([quoteSymbol, sexp], tokenMetaToSexpMeta(token.meta)),
+          sexp: S.List([quoteSymbol, sexp], tokenMetaToSexpMeta(token.meta)),
           remain,
         }
       }
 
       case "Hashtag": {
         return {
-          sexp: X.Hashtag(token.value, tokenMetaToSexpMeta(token.meta)),
+          sexp: S.Hashtag(token.value, tokenMetaToSexpMeta(token.meta)),
           remain: tokens.slice(1),
         }
       }
@@ -131,8 +131,8 @@ export class Parser {
   }
 
   private handleTokensInBracket(start: Token, tokens: Array<Token>): Result {
-    const array: Array<X.Sexp> = []
-    const attributes: X.Attributes = {}
+    const array: Array<S.Sexp> = []
+    const attributes: S.Attributes = {}
 
     while (true) {
       if (tokens[0] === undefined) {
@@ -149,7 +149,7 @@ export class Parser {
         }
 
         return {
-          sexp: X.Tael(
+          sexp: S.Tael(
             array,
             attributes,
             tokenMetaToSexpMeta({

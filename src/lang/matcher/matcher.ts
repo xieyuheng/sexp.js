@@ -1,13 +1,13 @@
 import { matchSexp, type Subst } from "../match/index.ts"
 import { parseSexp } from "../parser/index.ts"
-import * as X from "../sexp/index.ts"
+import * as S from "../sexp/index.ts"
 import { tokenMetaFromSexpMeta, type TokenMeta } from "../token/index.ts"
 
-export type Matcher<A> = (sexp: X.Sexp) => A | undefined
+export type Matcher<A> = (sexp: S.Sexp) => A | undefined
 
 export type MatcherCallback<A> = (
   subst: Subst,
-  options: { sexp: X.Sexp; meta: TokenMeta },
+  options: { sexp: S.Sexp; meta: TokenMeta },
 ) => A | undefined
 
 export function matcher<A>(
@@ -34,7 +34,7 @@ export function matcherChoice<A>(matchers: Array<Matcher<A>>): Matcher<A> {
   }
 }
 
-export function match<A>(matcher: Matcher<A>, sexp: X.Sexp): A {
+export function match<A>(matcher: Matcher<A>, sexp: S.Sexp): A {
   const result = matcher(sexp)
   if (result === undefined) throw new Error("match fail")
   else return result

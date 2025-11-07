@@ -1,14 +1,14 @@
 import assert from "node:assert"
 import { recordMapValue } from "../../helpers/record/recordMapValue.ts"
-import * as X from "../sexp/index.ts"
+import * as S from "../sexp/index.ts"
 import { type TokenMeta } from "./Token.ts"
 
-export function tokenMetaToSexpMeta(meta: TokenMeta): X.Attributes {
-  return X.asTael(X.sexpFromJson(meta)).attributes
+export function tokenMetaToSexpMeta(meta: TokenMeta): S.Attributes {
+  return S.asTael(S.sexpFromJson(meta)).attributes
 }
 
-export function tokenMetaFromSexpMeta(meta: X.Attributes): TokenMeta {
-  const json: any = recordMapValue(meta, X.sexpToJson)
+export function tokenMetaFromSexpMeta(meta: S.Attributes): TokenMeta {
+  const json: any = recordMapValue(meta, S.sexpToJson)
 
   try {
     assert(json)

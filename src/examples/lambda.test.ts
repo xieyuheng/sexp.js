@@ -1,7 +1,7 @@
 import assert from "node:assert"
 import { test } from "node:test"
 import { errorReport } from "../helpers/error/errorReport.ts"
-import * as X from "../index.ts"
+import * as S from "../index.ts"
 
 type Exp = Var | Lambda | Apply | Let
 type Var = { kind: "Var"; name: string }
@@ -25,34 +25,34 @@ function Let(name: string, rhs: Exp, body: Exp): Let {
   return { kind: "Let", name, rhs, body }
 }
 
-function matchExp(sexp: X.Sexp): Exp {
-  return X.match(expMatcher, sexp)
+function matchExp(sexp: S.Sexp): Exp {
+  return S.match(expMatcher, sexp)
 }
 
 const keywords = ["lambda", "let"]
 
-const expMatcher: X.Matcher<Exp> = X.matcherChoice<Exp>([
-  X.matcher("`(lambda (,name) ,ret)", ({ name, ret }) =>
-    Lambda(X.symbolContent(name), X.match(expMatcher, ret)),
+const expMatcher: S.Matcher<Exp> = S.matcherChoice<Exp>([
+  S.matcher("`(lambda (,name) ,ret)", ({ name, ret }) =>
+    Lambda(S.symbolContent(name), S.match(expMatcher, ret)),
   ),
 
-  X.matcher("`(let ((,name ,rhs)) ,body)", ({ name, rhs, body }) =>
+  S.matcher("`(let ((,name ,rhs)) ,body)", ({ name, rhs, body }) =>
     Let(
-      X.symbolContent(name),
-      X.match(expMatcher, rhs),
-      X.match(expMatcher, body),
+      S.symbolContent(name),
+      S.match(expMatcher, rhs),
+      S.match(expMatcher, body),
     ),
   ),
 
-  X.matcher("`(,target ,arg)", ({ target, arg }) =>
-    Apply(X.match(expMatcher, target), X.match(expMatcher, arg)),
+  S.matcher("`(,target ,arg)", ({ target, arg }) =>
+    Apply(S.match(expMatcher, target), S.match(expMatcher, arg)),
   ),
 
-  X.matcher("name", ({ name }, { meta }) => {
-    const nameSymbol = X.symbolContent(name)
+  S.matcher("name", ({ name }, { meta }) => {
+    const nameSymbol = S.symbolContent(name)
     if (keywords.includes(nameSymbol)) {
       let message = "keywork should not be used as variable\n"
-      throw new X.ErrorWithMeta(message, meta)
+      throw new S.ErrorWithMeta(message, meta)
     }
 
     return Var(nameSymbol)
@@ -61,7 +61,7 @@ const expMatcher: X.Matcher<Exp> = X.matcherChoice<Exp>([
 
 function assertParse(text: string, exp: Exp): void {
   const url = new URL("test:lambda")
-  assert.deepStrictEqual(matchExp(X.parseSexp(text, { url })), exp)
+  assert.deepStrictEqual(matchExp(S.parseSexp(text, { url })), exp)
 }
 
 test("examples/lambda", () => {
@@ -85,7 +85,7 @@ test("examples/lambda", () => {
 function assertErrorWithMeta(text: string): void {
   try {
     const url = new URL("test:lambda")
-    matchExp(X.parseSexp(text, { url }))
+    matchExp(S.parseSexp(text, { url }))
   } catch (error) {
     console.log(errorReport(error))
   }

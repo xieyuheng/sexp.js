@@ -2,7 +2,7 @@ import assert from "node:assert"
 import { test } from "node:test"
 import { errorReport } from "../helpers/error/errorReport.ts"
 import { recordMapValue } from "../helpers/record/recordMapValue.ts"
-import * as X from "../index.ts"
+import * as S from "../index.ts"
 
 type Type = TypeVar | Arrow | Union | Inter | Tau
 type TypeVar = { kind: "TypeVar"; name: string }
@@ -45,38 +45,38 @@ function Tau(
   }
 }
 
-function matchType(sexp: X.Sexp): Type {
-  return X.match(typeMatcher, sexp)
+function matchType(sexp: S.Sexp): Type {
+  return S.match(typeMatcher, sexp)
 }
 
-const typeMatcher: X.Matcher<Type> = X.matcherChoice<Type>([
-  X.matcher("(cons '-> types)", ({ types }) =>
-    X.listElements(types)
+const typeMatcher: S.Matcher<Type> = S.matcherChoice<Type>([
+  S.matcher("(cons '-> types)", ({ types }) =>
+    S.listElements(types)
       .map(matchType)
       .reduceRight((retType, argType) => Arrow(argType, retType)),
   ),
 
-  X.matcher("(cons 'union types)", ({ types }) =>
-    Union(X.listElements(types).map(matchType)),
+  S.matcher("(cons 'union types)", ({ types }) =>
+    Union(S.listElements(types).map(matchType)),
   ),
 
-  X.matcher("(cons 'inter types)", ({ types }) =>
-    Inter(X.listElements(types).map(matchType)),
+  S.matcher("(cons 'inter types)", ({ types }) =>
+    Inter(S.listElements(types).map(matchType)),
   ),
 
-  X.matcher("(cons 'tau types)", ({ types }, { sexp }) =>
+  S.matcher("(cons 'tau types)", ({ types }, { sexp }) =>
     Tau(
-      X.listElements(types).map(matchType),
-      recordMapValue(X.asTael(sexp).attributes, matchType),
+      S.listElements(types).map(matchType),
+      recordMapValue(S.asTael(sexp).attributes, matchType),
     ),
   ),
 
-  X.matcher("name", ({ name }) => TypeVar(X.symbolContent(name))),
+  S.matcher("name", ({ name }) => TypeVar(S.symbolContent(name))),
 ])
 
 function assertParse(text: string, type: Type): void {
   const url = new URL("test:tau")
-  assert.deepStrictEqual(matchType(X.parseSexp(text, { url })), type)
+  assert.deepStrictEqual(matchType(S.parseSexp(text, { url })), type)
 }
 
 test("examples/tau", () => {
@@ -136,7 +136,7 @@ test("examples/tau", () => {
 function assertErrorWithMeta(text: string): void {
   try {
     const url = new URL("test:tau")
-    matchType(X.parseSexp(text, { url }))
+    matchType(S.parseSexp(text, { url }))
   } catch (error) {
     console.log(errorReport(error))
   }

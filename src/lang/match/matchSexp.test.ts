@@ -2,11 +2,11 @@ import assert from "node:assert"
 import { test } from "node:test"
 import { matchSexp } from "../match/index.ts"
 import { parseSexp } from "../parser/index.ts"
-import * as X from "../sexp/index.ts"
+import * as S from "../sexp/index.ts"
 
 function assertMatch(
   patternInput: string,
-  sexpInput: string | X.Sexp,
+  sexpInput: string | S.Sexp,
   expectedInput: string,
 ): void {
   const pattern = parseSexp(patternInput)
@@ -14,7 +14,7 @@ function assertMatch(
   const subst = matchSexp("NormalMode", pattern, sexp)({})
   const expectedSexp = parseSexp(expectedInput)
   assert(subst)
-  assert(X.attributesEqual(subst, X.asTael(expectedSexp).attributes))
+  assert(S.attributesEqual(subst, S.asTael(expectedSexp).attributes))
 }
 
 function assertMatchFail(patternInput: string, sexpInput: string): void {

@@ -2,7 +2,7 @@ import { type Command } from "@xieyuheng/commander.js"
 import fs from "node:fs"
 import { errorReport } from "../helpers/error/errorReport.ts"
 import { createUrlOrFileUrl } from "../helpers/url/createUrlOrFileUrl.ts"
-import * as X from "../index.ts"
+import * as S from "../index.ts"
 
 export const FormatCommand: Command = {
   name: "format",
@@ -25,9 +25,9 @@ export const FormatCommand: Command = {
     try {
       const url = createUrlOrFileUrl(commander.args[0])
       const text = loadText(url)
-      const sexps = X.parseSexps(text)
+      const sexps = S.parseSexps(text)
       for (const sexp of sexps) {
-        console.log(X.prettySexp(60, sexp))
+        console.log(S.prettySexp(60, sexp))
         console.log()
       }
     } catch (error) {
