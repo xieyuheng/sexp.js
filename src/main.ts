@@ -1,5 +1,3 @@
-#!/usr/bin/env -S node --stack-size=65536
-
 import * as Cmd from "@xieyuheng/command.js"
 import fs from "node:fs"
 import { errorReport } from "./helpers/error/errorReport.ts"
@@ -13,7 +11,7 @@ const router = Cmd.createRouter("x-sexp.js", version)
 router.defineRoutes(["format file -- format a file"])
 
 router.defineHandlers({
-  format: async ([file]) => {
+  format: ([file]) => {
     const text = fs.readFileSync(file, "utf8")
     const sexps = S.parseSexps(text)
     for (const sexp of sexps) {
